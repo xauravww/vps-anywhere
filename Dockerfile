@@ -17,8 +17,16 @@ RUN echo 'root:root' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
-# Expose SSH port
-EXPOSE 22
+# Use environment variable PORT if set, else default to 22
+ENV SSH_PORT=22
+ARG PORT
+ENV PORT=${PORT:-22}
+
+# Update sshd_config to listen on the specified port
+RUN sed -i "s/#Port 22/Port ${PORT}/" /etc/ssh/sshd_config
+
+# Expose the port dynamically
+EXPOSE ${PORT}
 
 # Start SSH service
 CMD ["/usr/sbin/sshd", "-D"]
