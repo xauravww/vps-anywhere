@@ -1,49 +1,61 @@
-# VPS Docker Container
+# VPS Anywhere: In-Browser Terminal with Docker & Render
 
-This Dockerfile creates a container that can be deployed to hosting providers (e.g., render.com) and used as a VPS with root SSH access.
+This project provides a Dockerfile to deploy a web-based terminal (using [ttyd](https://github.com/tsl0922/ttyd)) to platforms like Render.com. When deployed, you can access a full-featured bash shell directly from your browser.
 
 ## Features
 
-- Ubuntu 22.04 base image
-- OpenSSH server installed and configured
-- Root login enabled with password authentication
-- Default root password: `root` (please change after deployment)
-- SSH port 22 exposed
+- Lightweight Alpine Linux base
+- [ttyd](https://github.com/tsl0922/ttyd): share terminal over the web
+- Bash shell in-browser
+- Easy deployment to Render or any container host
 
 ## Usage
 
 ### Build the Docker image
 
 ```bash
-docker build -t vps-container .
+docker build -t vps-anywhere .
 ```
 
-### Run the container
+### Run the container locally
 
 ```bash
-docker run -d -p 2222:22 --name my-vps vps-container
+docker run -d -p 7681:7681 --name my-vps vps-anywhere
 ```
 
-This maps port 2222 on your host to port 22 in the container.
+This maps port 7681 on your host to port 7681 in the container.
 
-### Connect via SSH
+### Access the Terminal
 
-```bash
-ssh root@localhost -p 2222
+Open your browser and go to:
+
+```
+http://localhost:7681
 ```
 
-Password: `root`
+You will see a bash terminal running in your browser.
 
-## Important Notes
+## Deploying to Render.com or Similar Hosting Providers
 
-- Change the root password immediately after connecting for security.
-- This container provides root access via SSH, so use it responsibly.
-- When deploying to hosting providers like render.com, ensure the SSH port is exposed and accessible.
+1. Push your code (with this Dockerfile) to a GitHub repository.
+2. On Render.com, create a new **Web Service** and connect your repository.
+3. Set the port to `7681` (Render will ask for this during setup).
+4. Deploy the service.
+5. Open the Render-provided URL in your browser to access your terminal.
+
+## Security Note
+
+- By default, anyone with the URL can access the terminal. For production, add authentication or restrict access.
+- Do **not** use this for sensitive workloads unless you secure it.
+
+## Customization
+- You can change the shell (e.g., to `sh` or `zsh`) by editing the last line of the Dockerfile.
+- To add authentication, consider using a reverse proxy or ttyd's built-in options.
 
 ## Troubleshooting
-
-- If you cannot connect, verify the container is running and the SSH service is active.
-- Check container logs for any errors:
+- If you can't access the terminal, ensure the service is running and the correct port is exposed.
+- Check container logs for errors:
 
 ```bash
 docker logs my-vps
+```
