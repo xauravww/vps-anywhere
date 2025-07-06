@@ -5,7 +5,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Update and install required packages
 RUN apt-get update && apt-get install -y \
-    ttyd \
     openssh-server \
     sudo \
     bash \
@@ -14,7 +13,6 @@ RUN apt-get update && apt-get install -y \
     xfce4 xfce4-goodies xorg dbus-x11 x11-xserver-utils \
     x11vnc \
     novnc websockify \
-    nginx \
     xvfb \
     && rm -rf /var/lib/apt/lists/*
 
@@ -29,14 +27,13 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
 # Set up a default password for VNC
 RUN x11vnc -storepasswd 1234 /etc/x11vnc.pass
 
-# Supervisor and nginx config
+# Supervisor config
 RUN mkdir -p /etc/supervisor.d
 COPY supervisord-ttyd-sshd.ini /etc/supervisor.d/
 COPY supervisord.conf /etc/supervisord.conf
-COPY nginx.conf /etc/nginx/nginx.conf
 
-# Expose HTTP, ttyd, SSH, and noVNC ports
-EXPOSE 80 7681 22 6080
+# Expose only noVNC (desktop) and SSH ports
+EXPOSE 8080 22
 
 # Start supervisor to run all services
 CMD ["supervisord", "-c", "/etc/supervisord.conf"]
