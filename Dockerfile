@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     x11vnc \
     novnc websockify \
     nginx \
+    xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 # Set root password (change for security!)
